@@ -14,10 +14,14 @@ MACTransmissionStatus SerialDebugMACLayer::send(const uip_lladdr_t* lladdr_dest,
     Serial.println(length, DEC);
 
     Serial.print("TRANSMISSIONS COUNT:");
+    *number_transmissions = 1;
     Serial.println(*number_transmissions, DEC);
 
     Serial.print("DATA:");
-    Serial.println(*data, HEX);
+    for (int i=0; i<length; ++i) {
+        Serial.println(*(data+i), HEX);
+        Serial.print(" ");
+    }
 
     return MACTransmissionStatus::MAC_TX_STATUS_OK;
 }
@@ -26,9 +30,6 @@ bool SerialDebugMACLayer::receive(uip_lladdr_t* lladdr_src, uip_lladdr_t* lladdr
     uint8_t inChar = (uint8_t)"\n";
     *length = 0;
 
-    //Fake MAC
-    
-
     Serial.println("\nRECEIVING:");
 
     do {
@@ -36,7 +37,8 @@ bool SerialDebugMACLayer::receive(uip_lladdr_t* lladdr_src, uip_lladdr_t* lladdr
             *(data + *length) = (uint8_t)Serial.read();
             *length++;
 
-            Serial.println(*(data + *length), HEX);
+            Serial.print(*(data + *length), HEX);
+            Serial.print(" ");
         }
     } while (inChar != (uint8_t)"\n");
 
@@ -44,6 +46,12 @@ bool SerialDebugMACLayer::receive(uip_lladdr_t* lladdr_src, uip_lladdr_t* lladdr
         Serial.println("*Nothing*");
         return false;
     }
+
+    //fake distant MAC
+    for (int i=8; i>0; --i) lladdr_src->addr[i] = i;
+
+    //fake MAC dest
+    for (int i=0; i<8; ++i) lladdr_dest->addr[i] = i;
 
     Serial.println("RECEIVED FROM MAC ADDRESS: 0x");
     for (int i=0; i<8; ++i) Serial.print(lladdr_src->addr[i], HEX);
@@ -55,7 +63,10 @@ bool SerialDebugMACLayer::receive(uip_lladdr_t* lladdr_src, uip_lladdr_t* lladdr
     Serial.println(*length, DEC);
 
     Serial.println("\nDATA:");
-    Serial.println(*data, HEX);
+    for (int i=0; i<*length; ++i) {
+        Serial.println(*(data+i), HEX);
+        Serial.print(" ");
+    }
     
     const uip_lladdr_t* selfAddress = getMacAddress();
     for (int i=0; i<8; ++i) {

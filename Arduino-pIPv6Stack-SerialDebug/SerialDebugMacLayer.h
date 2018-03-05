@@ -5,6 +5,7 @@
 #include <HardwareSerial.h>
 
 class SerialDebugMACLayer : public MACLayer {
+    public:
     //********************************************************************************************************//
 	/*____function init(): Initializes the MAC Layer. Must be called before performing any other operation.
 	 *
@@ -48,7 +49,7 @@ class SerialDebugMACLayer : public MACLayer {
      *____Out: boolean : true--  packet for myself, and store the dst and src MAC@
      *				     false-- packet for someone else
      */
-    bool receive(uip_lladdr_t* lladdr_src, uip_lladdr_t* lladdr_dest, uint8_t* data, uint16_t* length) = 0;
+    bool receive(uip_lladdr_t* lladdr_src, uip_lladdr_t* lladdr_dest, uint8_t* data, uint16_t* length);
 	//********************************************************************************************************//
 
     //********************************************************************************************************//
@@ -59,6 +60,6 @@ class SerialDebugMACLayer : public MACLayer {
      */
     const uip_lladdr_t* getMacAddress();
 	//********************************************************************************************************//
-}
+};
 
 #endif /* __SERIALDEBUGMACLAYER_H__ */
