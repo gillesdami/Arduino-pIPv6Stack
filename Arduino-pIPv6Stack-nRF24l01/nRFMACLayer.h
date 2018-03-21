@@ -4,9 +4,15 @@
 #include "MACLayer.h"
 #include <HardwareSerial.h>
 
-class SerialDebugMACLayer : public MACLayer {
+#include <SPI.h>
+#include "nRF24L01.h"
+#include "RF24.h"
+
+
+class nRFMACLayer : public MACLayer {
     private:
     uip_lladdr_t* selfMacAddress;
+    RF24 radio;
 
     public:
     void setMacAddress(uip_lladdr_t* selfMacAddress) {

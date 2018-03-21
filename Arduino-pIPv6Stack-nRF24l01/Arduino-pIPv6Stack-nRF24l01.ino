@@ -1,4 +1,4 @@
-#include "XBeeMACLayer.h"
+#include "nRFmacLayer.h"
 #include "PicoIPv6Connection.h"
 //#include "CoAPEngine.h"
 #define DEBUG 0
@@ -19,7 +19,7 @@ u8_t buf[UIP_BUFSIZE];
 
 #define UDP_CLIENT_PORT 8765
 
-XBeeMACLayer mac;
+nRFmacLayer mac;
 
 PicoIPv6Connection* connection;
 //CoAPEngine coap;						// CoAPEngine-alpha. Sends CoAP PUT Non-Confirmable messages with URI, Query, optional second Query, and payload.
@@ -27,10 +27,14 @@ PicoIPv6Connection* connection;
 
 //struct timer udp_msg_timer;
 
-void setup() {    
+void setup() {
   Serial.begin(9600);
   delay(1000);
   
+  uip_lladdr_t* selfAddress = new uip_lladdr_t();
+  for (int i=0; i<8; ++i) selfAddress->addr[i] = i;
+  mac.setMacAddress(selfAddress);
+
   if (!mac.init()){
     PRINTF("CANNOT INITIALIZE XBEE MODULE.. CANNOT CONTINUE");
     while (1){};

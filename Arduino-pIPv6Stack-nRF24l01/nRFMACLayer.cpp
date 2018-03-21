@@ -1,12 +1,15 @@
-#include "SerialDebugMACLayer.h"
+#include "nRFMACLayer.h"
 
-bool SerialDebugMACLayer::init() {
-    Serial.begin(9600);
+bool nRFMACLayer::init() {
+    this->radio = new RF24(7, 8);
+    Serial.begin(115200);
+    radio.begin();
+    radio.openWritingPipe(addresse);
 
     return true;
 }
 
-MACTransmissionStatus SerialDebugMACLayer::send(const uip_lladdr_t* lladdr_dest, uint8_t* data, uint16_t length, int* number_transmissions) {
+MACTransmissionStatus nRFMACLayer::send(const uip_lladdr_t* lladdr_dest, uint8_t* data, uint16_t length, int* number_transmissions) {
     Serial.println("MAC ADDRESS DEST: 0x");
     for (int i=0; i<8; ++i) Serial.print(lladdr_dest->addr[i], HEX);
 
@@ -23,10 +26,12 @@ MACTransmissionStatus SerialDebugMACLayer::send(const uip_lladdr_t* lladdr_dest,
         Serial.print(" ");
     }
 
+    radio.write( message, taille );
+
     return MACTransmissionStatus::MAC_TX_STATUS_OK;
 }
 
-bool SerialDebugMACLayer::receive(uip_lladdr_t* lladdr_src, uip_lladdr_t* lladdr_dest, uint8_t* data, uint16_t* length) {
+bool nRFMACLayer::receive(uip_lladdr_t* lladdr_src, uip_lladdr_t* lladdr_dest, uint8_t* data, uint16_t* length) {
     uint8_t inChar = (uint8_t)"\n";
     *length = 0;
 
@@ -80,7 +85,7 @@ bool SerialDebugMACLayer::receive(uip_lladdr_t* lladdr_src, uip_lladdr_t* lladdr
     return true;
 }
 
-const uip_lladdr_t* SerialDebugMACLayer::getMacAddress() {
+const uip_lladdr_t* nRFMACLayer::getMacAddress() {
     if(this->selfMacAddress) return this->selfMacAddress;
 
     uip_lladdr_t* selfAddress = new uip_lladdr_t();
